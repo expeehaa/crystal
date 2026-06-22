@@ -252,4 +252,30 @@ describe YAML::Builder do
       end
     end
   end
+
+  it "wraps long lines of sequences in flow style by default" do
+    assert_built("--- [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21,\n  22, 23, 24, 25, 26, 27, 28, 29]\n") do
+      sequence(style: YAML::SequenceStyle::FLOW) do
+        30.times do |i|
+          scalar(i)
+        end
+      end
+    end
+  end
+
+  it "wraps long lines of mappings in flow style by default" do
+    assert_built("--- {0: 1, 2: 3, 4: 5, 6: 7, 8: 9, 10: 11, 12: 13, 14: 15, 16: 17, 18: 19, 20: 21,\n  22: 23, 24: 25, 26: 27, 28: 29}\n") do
+      mapping(style: YAML::MappingStyle::FLOW) do
+        30.times do |i|
+          scalar(i)
+        end
+      end
+    end
+  end
+
+  it "wraps long lines of strings containing whitespace by default" do
+    assert_built("--- 'cr cr cr cr cr cr cr cr cr cr cr cr cr cr cr cr cr cr cr cr cr cr cr cr cr cr\n  cr cr cr cr '\n") do
+      scalar("cr "*30)
+    end
+  end
 end
