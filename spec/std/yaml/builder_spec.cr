@@ -31,6 +31,17 @@ private def build_stream(&)
   end
 end
 
+private def build_stream(*, preferred_line_width, &)
+  String.build do |io|
+    YAML::Builder.build(io) do |yaml|
+      yaml.preferred_line_width = preferred_line_width
+      yaml.stream do
+        yield yaml
+      end
+    end
+  end
+end
+
 describe YAML::Builder do
   describe "#document" do
     describe "implicit_start_indicator" do
@@ -276,6 +287,41 @@ describe YAML::Builder do
   it "wraps long lines of strings containing whitespace by default" do
     assert_built("--- 'cr cr cr cr cr cr cr cr cr cr cr cr cr cr cr cr cr cr cr cr cr cr cr cr cr cr\n  cr cr cr cr '\n") do
       scalar("cr "*30)
+    end
+  end
+
+  describe "#preferred_line_width" do
+    it "sets the preferred line width to lower values than the default" do
+      build_stream(preferred_line_width: 20) do |yaml|
+        yaml.document do
+          yaml.sequence(style: YAML::SequenceStyle::FLOW) do
+            30.times do |i|
+              yaml.scalar(i)
+            end
+          end
+        end
+      end.should eq "--- [0, 1, 2, 3, 4, 5,\n  6, 7, 8, 9, 10, 11,\n  12, 13, 14, 15, 16,\n  17, 18, 19, 20, 21,\n  22, 23, 24, 25, 26,\n  27, 28, 29]\n"
+    end
+
+    it "sets the preferred line width to higher values than the default" do
+      build_stream(preferred_line_width: 100) do |yaml|
+        yaml.document do
+          yaml.sequence(style: YAML::SequenceStyle::FLOW) do
+            30.times do |i|
+              yaml.scalar(i)
+            end
+          end
+        end
+      end.should eq "--- [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26,\n  27, 28, 29]\n"
+    end
+
+    it "when nil sets the preferred line width to unlimited" do
+      very_long_string = "cr "*1000
+      build_stream(preferred_line_width: nil) do |yaml|
+        yaml.document do
+          yaml.scalar(very_long_string)
+        end
+      end.should eq "--- '#{very_long_string}'\n"
     end
   end
 end

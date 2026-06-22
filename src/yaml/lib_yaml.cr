@@ -153,6 +153,7 @@ lib LibYAML
   fun yaml_emitter_delete(emitter : Emitter*)
   fun yaml_emitter_flush(emitter : Emitter*) : Int
   fun yaml_emitter_set_unicode(emitter : Emitter*, unicode : Int)
+  fun yaml_emitter_set_width(emitter : Emitter*, width : LibC::Int)
 
   fun yaml_get_version(major : LibC::Int*, minor : LibC::Int*, patch : LibC::Int*)
 end

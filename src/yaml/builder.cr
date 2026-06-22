@@ -55,6 +55,14 @@ class YAML::Builder
     yield builder ensure builder.close
   end
 
+  # Sets the preferred line width for the emitter.
+  #
+  # If `width` is `nil` or a negative number, the preferred line width will be unlimited.
+  # This method must be called before `#start_stream`, otherwise it may result in unexpected behavior.
+  def preferred_line_width=(width)
+    LibYAML.yaml_emitter_set_width(@emitter, width || -1)
+  end
+
   # Starts a YAML stream.
   def start_stream
     emit stream_start, LibYAML::Encoding::UTF8
