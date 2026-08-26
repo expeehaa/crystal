@@ -2,6 +2,7 @@ require "./yaml/*"
 require "./yaml/schema/*"
 require "./yaml/schema/core/*"
 require "./yaml/nodes/*"
+require "./yaml/builder/*"
 require "semantic_version"
 
 require "base64"

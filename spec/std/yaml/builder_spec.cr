@@ -21,7 +21,7 @@ private def append_stream_end_indicator(yaml)
   end
 end
 
-private def build_stream(&)
+private def build_stream(config = nil, &)
   String.build do |io|
     YAML::Builder.build(io) do |yaml|
       yaml.stream do
@@ -324,4 +324,6 @@ describe YAML::Builder do
       end.should eq "--- '#{very_long_string}'\n"
     end
   end
+
+  it ""
 end

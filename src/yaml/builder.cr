@@ -47,11 +47,21 @@ class YAML::Builder
     }, @box)
   end
 
+  def configure(config : YAML::Builder::Config)
+    if (max_nesting = config.max_nesting)
+      self.max_nesting = max_nesting
+    end
+    if (preferred_line_width = config.preferred_line_width)
+      self.preferred_line_width = preferred_line_width
+    end
+  end
+
   # Creates a `YAML::Builder` that writes to *io* and yields it to the block.
   #
   # After returning from the block the builder is closed.
-  def self.build(io : IO, & : self ->) : Nil
+  def self.build(io : IO, config : YAML::Builder::Config? = nil, & : self ->) : Nil
     builder = new(io)
+    builder.configure(config) if config
     yield builder ensure builder.close
   end
 
@@ -262,17 +272,17 @@ module YAML
   # end
   # string # => "---\nfoo:\n- 1\n- 2\n"
   # ```
-  def self.build(&)
+  def self.build(config : YAML::Builder::Config? = nil, &)
     String.build do |str|
-      build(str) do |yaml|
+      build(str, config) do |yaml|
         yield yaml
       end
     end
   end
 
   # Writes YAML into the given `IO`. A `YAML::Builder` is yielded to the block.
-  def self.build(io : IO, &) : Nil
-    YAML::Builder.build(io) do |yaml|
+  def self.build(io : IO, config : YAML::Builder::Config? = nil, &) : Nil
+    YAML::Builder.build(io, config) do |yaml|
       yaml.stream do
         yaml.document do
           yield yaml
